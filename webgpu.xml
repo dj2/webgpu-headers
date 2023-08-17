@@ -1,0 +1,2035 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<webgpu>
+  <license>
+BSD 3-Clause License
+
+Copyright (c) 2019, "WebGPU native" developers
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  </license>
+
+  <metadata>
+    <xml_version>1</xml_version>
+    <prefix>
+      <c>WGPU</c>
+    </prefix>
+  </metadata>
+
+  <defines>
+    <define name="WHOLE_SIZE" type="uint64_t" value="UINT64_MAX" />
+    <define name="WHOLE_MAP_SIZE" type="size_t" value="SIZE_MAX" />
+    <define name="COPY_STRIDE_UNDEFINED" type="uint32_t" value="UINT32_MAX" />
+    <define name="LIMIT_U32_UNDEFINED" type="uint32_t" value="UINT32_MAX" />
+    <define name="LIMIT_U64_UNDEFINED" type="uint64_t" value="UINT64_MAX" />
+    <define name="ARRAY_LAYER_COUNT_UNDEFINED" type="uint32_t" value="UINT32_MAX" />
+    <define name="MIP_LEVEL_COUNT_UNDEFINED" type="uint32_t" value="UINT32_MAX" />
+    <define name="DEPTH_SLICE_UNDEFINED" type="uint32_t" value="UINT32_MAX" />
+    <define name="QUERY_SET_INDEX_UNDEFINED" type="uint32_t" value="UINT32_MAX" />
+
+  </defines>
+
+  <types>
+    <type kind='value'>
+      <name>Flags</name>
+      <kind>uint32_t</kind>
+    </type>
+    <type kind='value'>
+      <name>Bool</name>
+      <kind>uint32_t</kind>
+    </type>
+    <type kind='enum'>
+      <name>RequestAdapterStatus</name>
+      <value name="Success" value="0" />
+      <value name="Unavailable" value="1" />
+      <value name="Error" value="2" />
+      <value name="Unknown" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>AdapterType</name>
+      <value name="DiscreteGPU" value="1" />
+      <value name="IntegratedGPU" value="2" />
+      <value name="CPU" value="3" />
+      <value name="Unknown" value="4" />
+    </type>
+    <type kind='enum'>
+      <name>AddressMode</name>
+      <value name="Undefined" value="0" />
+      <value name="ClampToEdge" value="1" />
+      <value name="Repeat" value="2" />
+      <value name="MirrorRepeat" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>BackendType</name>
+      <value name="Undefined" value="0" />
+      <value name="Null" value="1" />
+      <value name="WebGPU" value="2" />
+      <value name="D3D11" value="3" />
+      <value name="D3D12" value="4" />
+      <value name="Metal" value="5" />
+      <value name="Vulkan" value="6" />
+      <value name="OpenGL" value="7" />
+      <value name="OpenGLES" value="8" />
+    </type>
+    <type kind='enum'>
+      <name>BufferBindingType</name>
+      <value name="Undefined" value="0" />
+      <value name="Uniform" value="1" />
+      <value name="Storage" value="2" />
+      <value name="ReadOnlyStorage" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>SamplerBindingType</name>
+      <value name="Undefined" value="0" />
+      <value name="Filtering" value="1" />
+      <value name="NonFiltering" value="2" />
+      <value name="Comparison" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>TextureSampleType</name>
+      <value name="Undefined" value="0" />
+      <value name="float" value="1" />
+      <value name="UnfilterableFloat" value="2" />
+      <value name="Depth" value="3" />
+      <value name="Sint" value="4" />
+      <value name="Uint" value="5" />
+    </type>
+    <type kind='enum'>
+      <name>StorageTextureAccess</name>
+      <value name="Undefined" value="0" />
+      <value name="WriteOnly" value="1" />
+      <value name="ReadOnly" value="2" />
+      <value name="ReadWrite" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>BlendFactor</name>
+      <value name="Undefined" value="0" />
+      <value name="Zero" value="1" />
+      <value name="One" value="2" />
+      <value name="Src" value="3" />
+      <value name="OneMinusSrc" value="4" />
+      <value name="SrcAlpha" value="5" />
+      <value name="OneMinusSrcAlpha" value="6" />
+      <value name="Dst" value="7" />
+      <value name="OneMinusDst" value="8" />
+      <value name="DstAlpha" value="9" />
+      <value name="OneMinusDstAlpha" value="10" />
+      <value name="SrcAlphaSaturated" value="11" />
+      <value name="Constant" value="12" />
+      <value name="OneMinusConstant" value="13" />
+    </type>
+    <type kind='enum'>
+      <name>BlendOperation</name>
+      <value name="Undefined" value="0" />
+      <value name="Add" value="1" />
+      <value name="Subtract" value="2" />
+      <value name="ReverseSubtract" value="3" />
+      <value name="Min" value="4" />
+      <value name="Max" value="5" />
+    </type>
+    <type kind='enum'>
+      <name>BufferMapAsyncStatus</name>
+      <value name="Success" value="0" />
+      <value name="ValidationError" value="1" />
+      <value name="Unknown" value="2" />
+      <value name="DeviceLost" value="3" />
+      <value name="DestroyedBeforeCallback" value="4" />
+      <value name="UnmappedBeforeCallback" value="5" />
+      <value name="MappingAlreadyPending" value="6" />
+      <value name="OffsetOutOfRange" value="7" />
+      <value name="SizeOutOfRange" value="8" />
+    </type>
+    <type kind='enum'>
+      <name>BufferMapState</name>
+      <value name="Unmapped" value="1" />
+      <value name="Pending" value="2" />
+      <value name="Mapped" value="3" />
+    </type>
+    <type kind='bitmask'>
+      <name>BufferUsage</name>
+      <value name="None" value="0" />
+      <value name="MapRead" value="1" />
+      <value name="MapWrite" value="2" />
+      <value name="CopySrc" value="4" />
+      <value name="CopyDst" value="8" />
+      <value name="Index" value="16" />
+      <value name="Vertex" value="32" />
+      <value name="Uniform" value="64" />
+      <value name="Storage" value="128" />
+      <value name="Indirect" value="256" />
+      <value name="QueryResolve" value="512" />
+    </type>
+    <type kind='bitmask'>
+      <name>ColorWriteMask</name>
+      <value name="None" value="0" />
+      <value name="Red" value="1" />
+      <value name="Green" value="2" />
+      <value name="Blue" value="4" />
+      <value name="Alpha" value="8" />
+      <value name="All" value="15" />
+    </type>
+    <type kind='enum'>
+      <name>CompareFunction</name>
+      <value name="Undefined" value="0" />
+      <value name="Never" value="1" />
+      <value name="Less" value="2" />
+      <value name="Equal" value="3" />
+      <value name="LessEqual" value="4" />
+      <value name="Greater" value="5" />
+      <value name="NotEqual" value="6" />
+      <value name="GreaterEqual" value="7" />
+      <value name="Always" value="8" />
+    </type>
+    <type kind='enum'>
+      <name>CompilationInfoRequestStatus</name>
+      <value name="Success" value="0" />
+      <value name="Error" value="1" />
+      <value name="DeviceLost" value="2" />
+      <value name="Unknown" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>CompilationMessageType</name>
+      <value name="Error" value="1" />
+      <value name="Warning" value="2" />
+      <value name="Info" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>CompositeAlphaMode</name>
+      <value name="Auto" value="0" />
+      <value name="Opaque" value="1" />
+      <value name="Premultiplied" value="2" />
+      <value name="Unpremultiplied" value="3" />
+      <value name="Inherit" value="4" />
+    </type>
+    <type kind='enum'>
+      <name>CreatePipelineAsyncStatus</name>
+      <value name="Success" value="0" />
+      <value name="ValidationError" value="1" />
+      <value name="InternalError" value="2" />
+      <value name="DeviceLost" value="3" />
+      <value name="DeviceDestroyed" value="4" />
+      <value name="Unknown" value="5" />
+    </type>
+    <type kind='enum'>
+      <name>CullMode</name>
+      <value name="Undefined" value="0" />
+      <value name="None" value="1" />
+      <value name="Front" value="2" />
+      <value name="Back" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>DeviceLostReason</name>
+      <value name="Undefined" value="0" />
+      <value name="Destroyed" value="1" />
+    </type>
+    <type kind='enum'>
+      <name>ErrorFilter</name>
+      <value name="Validation" value="1" />
+      <value name="OutOfMemory" value="2" />
+      <value name="Internal" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>ErrorType</name>
+      <value name="NoError" value="0" />
+      <value name="Validation" value="1" />
+      <value name="OutOfMemory" value="2" />
+      <value name="Internal" value="3" />
+      <value name="Unknown" value="4" />
+      <value name="DeviceLost" value="5" />
+    </type>
+    <type kind='enum'>
+      <name>FeatureName</name>
+      <value name="Undefined" value="0" />
+      <value name="DepthClipControl" value="1" />
+      <value name="Depth32FloatStencil8" value="2" />
+      <value name="TimestampQuery" value="3" />
+      <value name="TextureCompressionBC" value="4" />
+      <value name="TextureCompressionETC2" value="5" />
+      <value name="TextureCompressionASTC" value="6" />
+      <value name="IndirectFirstInstance" value="7" />
+      <value name="ShaderF16" value="8" />
+      <value name="RG11B10UfloatRenderable" value="9" />
+      <value name="BGRA8UnormStorage" value="10" />
+      <value name="Float32Filterable" value="11" />
+    </type>
+    <type kind='enum'>
+      <name>FilterMode</name>
+      <value name="Undefined" value="0" />
+      <value name="Nearest" value="1" />
+      <value name="Linear" value="2" />
+    </type>
+    <type kind='enum'>
+      <name>FrontFace</name>
+      <value name="Undefined" value="0" />
+      <value name="CCW" value="1" />
+      <value name="CW" value="2" />
+    </type>
+    <type kind='enum'>
+      <name>IndexFormat</name>
+      <value name="Undefined" value="0" />
+      <value name="Uint16" value="1" />
+      <value name="Uint32" value="2" />
+    </type>
+    <type kind='enum'>
+      <name>CallbackMode</name>
+      <value name="WaitAnyOnly" value="0" />
+      <value name="AllowProcessEvents" value="1" />
+      <value name="AllowSpontaneous" value="2" />
+    </type>
+    <type kind='enum'>
+      <name>WaitStatus</name>
+      <value name="Success" value="0" />
+      <value name="TimedOut" value="1" />
+      <value name="UnsupportedTimeout" value="2" />
+      <value name="UnsupportedCount" value="3" />
+      <value name="UnsupportedMixedSources" value="4" />
+      <value name="Unknown" value="5" />
+    </type>
+    <type kind='enum'>
+      <name>VertexStepMode</name>
+      <value name="Undefined" value="0" />
+      <value name="VertexBufferNotUsed" value="1" />
+      <value name="Vertex" value="2" />
+      <value name="Instance" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>LoadOp</name>
+      <value name="Undefined" value="0" />
+      <value name="Clear" value="1" />
+      <value name="Load" value="2" />
+    </type>
+    <type kind='bitmask'>
+      <name>MapMode</name>
+      <value name="None" value="0" />
+      <value name="Read" value="1" />
+      <value name="Write" value="2" />
+    </type>
+    <type kind='enum'>
+      <name>MipmapFilterMode</name>
+      <value name="Undefined" value="0" />
+      <value name="Nearest" value="1" />
+      <value name="Linear" value="2" />
+    </type>
+    <type kind='enum'>
+      <name>StoreOp</name>
+      <value name="Undefined" value="0" />
+      <value name="Store" value="1" />
+      <value name="Discard" value="2" />
+    </type>
+    <type kind='enum'>
+      <name>PowerPreference</name>
+      <value name="Undefined" value="0" />
+      <value name="LowPower" value="1" />
+      <value name="HighPerformance" value="2" />
+    </type>
+    <type kind='enum'>
+      <name>PresentMode</name>
+      <value name="Fifo" value="1" />
+      <value name="FifoRelaxed" value="2" />
+      <value name="Immediate" value="3" />
+      <value name="Mailbox" value="4" />
+    </type>
+    <type kind='enum'>
+      <name>PrimitiveTopology</name>
+      <value name="Undefined" value="0" />
+      <value name="PointList" value="1" />
+      <value name="LineList" value="2" />
+      <value name="LineStrip" value="3" />
+      <value name="TriangleList" value="4" />
+      <value name="TriangleStrip" value="5" />
+    </type>
+    <type kind='enum'>
+      <name>QueryType</name>
+      <value name="Occlusion" value="1" />
+      <value name="Timestamp" value="2" />
+    </type>
+    <type kind='enum'>
+      <name>QueueWorkDoneStatus</name>
+      <value name="Success" value="0" />
+      <value name="Error" value="1" />
+      <value name="Unknown" value="2" />
+      <value name="DeviceLost" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>RequestDeviceStatus</name>
+      <value name="Success" value="0" />
+      <value name="Error" value="1" />
+      <value name="Unknown" value="2" />
+    </type>
+    <type kind='bitmask'>
+      <name>ShaderStage</name>
+      <value name="None" value="0" />
+      <value name="Vertex" value="1" />
+      <value name="Fragment" value="2" />
+      <value name="Compute" value="4" />
+    </type>
+    <type kind='enum'>
+      <name>StencilOperation</name>
+      <value name="Undefined" value="0" />
+      <value name="Keep" value="1" />
+      <value name="Zero" value="2" />
+      <value name="Replace" value="3" />
+      <value name="Invert" value="4" />
+      <value name="IncrementClamp" value="5" />
+      <value name="DecrementClamp" value="6" />
+      <value name="IncrementWrap" value="7" />
+      <value name="DecrementWrap" value="8" />
+    </type>
+    <type kind='enum'>
+      <name>SType</name>
+      <value name="Invalid" value="0" />
+      <value name="SurfaceDescriptorFromMetalLayer" value="1" />
+      <value name="SurfaceDescriptorFromWindowsHWND" value="2" />
+      <value name="SurfaceDescriptorFromXlibWindow" value="3" />
+      <value name="SurfaceDescriptorFromCanvasHTMLSelector" value="4" />
+      <value name="ShaderModuleSPIRVDescriptor" value="5" />
+      <value name="ShaderModuleWGSLDescriptor" value="6" />
+      <value name="PrimitiveDepthClipControl" value="7" />
+      <value name="SurfaceDescriptorFromWaylandSurface" value="8" />
+      <value name="SurfaceDescriptorFromAndroidNativeWindow" value="9" />
+      <value name="SurfaceDescriptorFromXcbWindow" value="10" />
+      <value name="RenderPassDescriptorMaxDrawCount" value="15" />
+      <value name="TextureBindingViewDimensionDescriptor" value="17" />
+    </type>
+    <type kind='enum'>
+      <name>SurfaceGetCurrentTextureStatus</name>
+      <value name="Success" value="0" />
+      <value name="Timeout" value="1" />
+      <value name="Outdated" value="2" />
+      <value name="Lost" value="3" />
+      <value name="OutOfMemory" value="4" />
+      <value name="DeviceLost" value="5" />
+    </type>
+    <type kind='enum'>
+      <name>TextureAspect</name>
+      <value name="Undefined" value="0" />
+      <value name="All" value="1" />
+      <value name="StencilOnly" value="2" />
+      <value name="DepthOnly" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>TextureDimension</name>
+      <value name="Undefined" value="0" />
+      <value name="1D" value="1" />
+      <value name="2D" value="2" />
+      <value name="3D" value="3" />
+    </type>
+    <type kind='enum'>
+      <name>TextureFormat</name>
+      <value name="Undefined" value="0" />
+      <value name="R8Unorm" value="1" />
+      <value name="R8Snorm" value="2" />
+      <value name="R8Uint" value="3" />
+      <value name="R8Sint" value="4" />
+      <value name="R16Uint" value="5" />
+      <value name="R16Sint" value="6" />
+      <value name="R16Float" value="7" />
+      <value name="RG8Unorm" value="8" />
+      <value name="RG8Snorm" value="9" />
+      <value name="RG8Uint" value="10" />
+      <value name="RG8Sint" value="11" />
+      <value name="R32Float" value="12" />
+      <value name="R32Uint" value="13" />
+      <value name="R32Sint" value="14" />
+      <value name="RG16Uint" value="15" />
+      <value name="RG16Sint" value="16" />
+      <value name="RG16Float" value="17" />
+      <value name="RGBA8Unorm" value="18" />
+      <value name="RGBA8UnormSrgb" value="19" />
+      <value name="RGBA8Snorm" value="20" />
+      <value name="RGBA8Uint" value="21" />
+      <value name="RGBA8Sint" value="22" />
+      <value name="BGRA8Unorm" value="23" />
+      <value name="BGRA8UnormSrgb" value="24" />
+      <value name="RGB10A2Uint" value="25" />
+      <value name="RGB10A2Unorm" value="26" />
+      <value name="RG11B10Ufloat" value="27" />
+      <value name="RGB9E5Ufloat" value="28" />
+      <value name="RG32Float" value="29" />
+      <value name="RG32Uint" value="30" />
+      <value name="RG32Sint" value="31" />
+      <value name="RGBA16Uint" value="32" />
+      <value name="RGBA16Sint" value="33" />
+      <value name="RGBA16Float" value="34" />
+      <value name="RGBA32Float" value="35" />
+      <value name="RGBA32Uint" value="36" />
+      <value name="RGBA32Sint" value="37" />
+      <value name="Stencil8" value="38" />
+      <value name="Depth16Unorm" value="39" />
+      <value name="Depth24Plus" value="40" />
+      <value name="Depth24PlusStencil8" value="41" />
+      <value name="Depth32Float" value="42" />
+      <value name="Depth32FloatStencil8" value="43" />
+      <value name="BC1RGBAUnorm" value="44" />
+      <value name="BC1RGBAUnormSrgb" value="45" />
+      <value name="BC2RGBAUnorm" value="46" />
+      <value name="BC2RGBAUnormSrgb" value="47" />
+      <value name="BC3RGBAUnorm" value="48" />
+      <value name="BC3RGBAUnormSrgb" value="49" />
+      <value name="BC4RUnorm" value="50" />
+      <value name="BC4RSnorm" value="51" />
+      <value name="BC5RGUnorm" value="52" />
+      <value name="BC5RGSnorm" value="53" />
+      <value name="BC6HRGBUfloat" value="54" />
+      <value name="BC6HRGBFloat" value="55" />
+      <value name="BC7RGBAUnorm" value="56" />
+      <value name="BC7RGBAUnormSrgb" value="57" />
+      <value name="ETC2RGB8Unorm" value="58" />
+      <value name="ETC2RGB8UnormSrgb" value="59" />
+      <value name="ETC2RGB8A1Unorm" value="60" />
+      <value name="ETC2RGB8A1UnormSrgb" value="61" />
+      <value name="ETC2RGBA8Unorm" value="62" />
+      <value name="ETC2RGBA8UnormSrgb" value="63" />
+      <value name="EACR11Unorm" value="64" />
+      <value name="EACR11Snorm" value="65" />
+      <value name="EACRG11Unorm" value="66" />
+      <value name="EACRG11Snorm" value="67" />
+      <value name="ASTC4x4Unorm" value="68" />
+      <value name="ASTC4x4UnormSrgb" value="69" />
+      <value name="ASTC5x4Unorm" value="70" />
+      <value name="ASTC5x4UnormSrgb" value="71" />
+      <value name="ASTC5x5Unorm" value="72" />
+      <value name="ASTC5x5UnormSrgb" value="73" />
+      <value name="ASTC6x5Unorm" value="74" />
+      <value name="ASTC6x5UnormSrgb" value="75" />
+      <value name="ASTC6x6Unorm" value="76" />
+      <value name="ASTC6x6UnormSrgb" value="77" />
+      <value name="ASTC8x5Unorm" value="78" />
+      <value name="ASTC8x5UnormSrgb" value="79" />
+      <value name="ASTC8x6Unorm" value="80" />
+      <value name="ASTC8x6UnormSrgb" value="81" />
+      <value name="ASTC8x8Unorm" value="82" />
+      <value name="ASTC8x8UnormSrgb" value="83" />
+      <value name="ASTC10x5Unorm" value="84" />
+      <value name="ASTC10x5UnormSrgb" value="85" />
+      <value name="ASTC10x6Unorm" value="86" />
+      <value name="ASTC10x6UnormSrgb" value="87" />
+      <value name="ASTC10x8Unorm" value="88" />
+      <value name="ASTC10x8UnormSrgb" value="89" />
+      <value name="ASTC10x10Unorm" value="90" />
+      <value name="ASTC10x10UnormSrgb" value="91" />
+      <value name="ASTC12x10Unorm" value="92" />
+      <value name="ASTC12x10UnormSrgb" value="93" />
+      <value name="ASTC12x12Unorm" value="94" />
+      <value name="ASTC12x12UnormSrgb" value="95" />
+    </type>
+    <type kind='bitmask'>
+      <name>TextureUsage</name>
+      <value name="None" value="0" />
+      <value name="CopySrc" value="1" />
+      <value name="CopyDst" value="2" />
+      <value name="TextureBinding" value="4" />
+      <value name="StorageBinding" value="8" />
+      <value name="RenderAttachment" value="16" />
+    </type>
+    <type kind='enum'>
+      <name>TextureViewDimension</name>
+      <value name="Undefined" value="0" />
+      <value name="1D" value="1" />
+      <value name="2D" value="2" />
+      <value name="2DArray" value="3" />
+      <value name="Cube" value="4" />
+      <value name="CubeArray" value="5" />
+      <value name="3D" value="6" />
+    </type>
+    <type kind='enum'>
+      <name>VertexFormat</name>
+      <value name="Undefined" value="0" />
+      <value name="Uint8x2" value="1" />
+      <value name="Uint8x4" value="2" />
+      <value name="Sint8x2" value="3" />
+      <value name="Sint8x4" value="4" />
+      <value name="Unorm8x2" value="5" />
+      <value name="Unorm8x4" value="6" />
+      <value name="Snorm8x2" value="7" />
+      <value name="Snorm8x4" value="8" />
+      <value name="Uint16x2" value="9" />
+      <value name="Uint16x4" value="10" />
+      <value name="Sint16x2" value="11" />
+      <value name="Sint16x4" value="12" />
+      <value name="Unorm16x2" value="13" />
+      <value name="Unorm16x4" value="14" />
+      <value name="Snorm16x2" value="15" />
+      <value name="Snorm16x4" value="16" />
+      <value name="Float16x2" value="17" />
+      <value name="Float16x4" value="18" />
+      <value name="Float32" value="19" />
+      <value name="Float32x2" value="20" />
+      <value name="Float32x3" value="21" />
+      <value name="Float32x4" value="22" />
+      <value name="Uint32" value="23" />
+      <value name="Uint32x2" value="24" />
+      <value name="Uint32x3" value="25" />
+      <value name="Uint32x4" value="26" />
+      <value name="Sint32" value="27" />
+      <value name="Sint32x2" value="28" />
+      <value name="Sint32x3" value="29" />
+      <value name="Sint32x4" value="30" />
+      <value name="Unorm10_10_10_2" value="31" />
+    </type>
+    <type kind='enum'>
+      <name>WGSLFeatureName</name>
+      <value name="Undefined" value="0" />
+      <value name="ReadonlyAndReadwriteStorageTextures" value="1" />
+      <value name="Packed4x8IntegerDotProduct" value="2" />
+      <value name="UnrestrictedPointerParameters" value="3" />
+      <value name="PointerCompositeAccess" value="4" />
+    </type>
+
+    <type kind='struct'>
+      <name>RequestAdapterOptions</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="compatibleSurface" type="Surface" optional="true" />
+        <member name="powerPreference" type="PowerPreference" default="undefined" />
+        <member name="backendType" type="BackendType" default="undefined" />
+        <member name="forceFallbackAdapter" type="bool" default="false" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>RequestAdapterCallbackInfo</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="mode" type="CallbackMode" />
+        <member name="callback" type="RequestAdapterCallback" />
+        <member name="userdata" type="void *" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>AdapterProperties</name>
+      <extensible>out</extensible>
+      <members>
+        <member name="vendorID" type="uint32_t" />
+        <member name="vendorName" type="char" default="nullptr" annotation="const *" length="strlen" />
+        <member name="architecture" type="char" default="nullptr" annotation="const *" length="strlen" />
+        <member name="deviceID" type="uint32_t" />
+        <member name="name" type="char" default="nullptr" annotation="const *" length="strlen" />
+        <member name="driverDescription" type="char" default="nullptr" annotation="const *" length="strlen" />
+        <member name="adapterType" type="AdapterType" />
+        <member name="backendType" type="BackendType" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>DeviceDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="requiredFeatureCount" type="size_t" default="0" />
+        <member name="requiredFeatures" type="FeatureName" default="nullptr" annotation="const *" length="required feature count" />
+        <member name="requiredLimits" type="RequiredLimits" optional="true" annotation="const *" />
+        <member name="defaultQueue" type="QueueDescriptor" />
+        <member name="deviceLostCallback" type="DeviceLostCallback" default="nullptr" />
+        <member name="deviceLostUserdata" type="void *" default="nullptr" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>BindGroupEntry</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="binding" type="uint32_t" />
+        <member name="buffer" type="Buffer" optional="true" />
+        <member name="offset" type="uint64_t" default="0" />
+        <member name="size" type="uint64_t" default="WGPU_WHOLE_SIZE" />
+        <member name="sampler" type="Sampler" optional="true" />
+        <member name="textureView" type="TextureView" optional="true" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>BindGroupDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="layout" type="BindGroupLayout" />
+        <member name="entryCount" type="size_t" />
+        <member name="entries" type="BindGroupEntry" annotation="const *" length="entry count" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>BufferBindingLayout</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="type" type="BufferBindingType" default="undefined" />
+        <member name="hasDynamicOffset" type="bool" default="false" />
+        <member name="minBindingSize" type="uint64_t" default="0" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SamplerBindingLayout</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="type" type="SamplerBindingType" default="undefined" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>TextureBindingLayout</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="sampleType" type="TextureSampleType" default="undefined" />
+        <member name="viewDimension" type="TextureViewDimension" default="2D" />
+        <member name="multisampled" type="bool" default="false" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SurfaceCapabilities</name>
+      <extensible>out</extensible>
+      <members>
+        <member name="formatCount" type="size_t" />
+        <member name="formats" type="TextureFormat" annotation="*" />
+        <member name="presentModeCount" type="size_t" />
+        <member name="presentModes" type="PresentMode" annotation="*" />
+        <member name="alphaModeCount" type="size_t" />
+        <member name="alphaModes" type="CompositeAlphaMode" annotation="*" />
+      </members>
+      <methods>
+        <function name="FreeMembers" return="void" />
+      </methods>
+    </type>
+    <type kind='struct'>
+      <name>SurfaceConfiguration</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="device" type="Device" />
+        <member name="format" type="TextureFormat" />
+        <member name="usage" type="TextureUsage" />
+        <member name="viewFormatCount" type="size_t" />
+        <member name="viewFormats" type="TextureFormat" annotation="const *" />
+        <member name="alphaMode" type="CompositeAlphaMode" />
+        <member name="width" type="uint32_t" />
+        <member name="height" type="uint32_t" />
+        <member name="presentMode" type="PresentMode" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>StorageTextureBindingLayout</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="access" type="StorageTextureAccess" default="undefined" />
+        <member name="format" type="TextureFormat" default="undefined" />
+        <member name="viewDimension" type="TextureViewDimension" default="2D" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>BindGroupLayoutEntry</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="binding" type="uint32_t" />
+        <member name="visibility" type="ShaderStage" />
+        <member name="buffer" type="BufferBindingLayout" />
+        <member name="sampler" type="SamplerBindingLayout" />
+        <member name="texture" type="TextureBindingLayout" />
+        <member name="storageTexture" type="StorageTextureBindingLayout" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>BindGroupLayoutDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="entryCount" type="size_t" />
+        <member name="entries" type="BindGroupLayoutEntry" annotation="const *" length="entry count" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>BlendComponent</name>
+      <members>
+        <member name="operation" type="BlendOperation" default="add" />
+        <member name="srcFactor" type="BlendFactor" default="one" />
+        <member name="dstFactor" type="BlendFactor" default="zero" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>BufferDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="usage" type="BufferUsage" />
+        <member name="size" type="uint64_t" />
+        <member name="mappedAtCreation" type="bool" default="false" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>BufferMapCallbackInfo</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="mode" type="CallbackMode" />
+        <member name="callback" type="BufferMapCallback" />
+        <member name="userdata" type="void *" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>Color</name>
+      <members>
+        <member name="r" type="double" />
+        <member name="g" type="double" />
+        <member name="b" type="double" />
+        <member name="a" type="double" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ConstantEntry</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="key" type="char" annotation="const *" length="strlen" />
+        <member name="value" type="double" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>CommandBufferDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>CommandEncoderDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>CompilationInfo</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="messageCount" type="size_t" />
+        <member name="messages" type="CompilationMessage" annotation="const *" length="message count" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>CompilationMessage</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="message" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="type" type="CompilationMessageType" />
+        <member name="lineNum" type="uint64_t" />
+        <member name="linePos" type="uint64_t" />
+        <member name="offset" type="uint64_t" />
+        <member name="length" type="uint64_t" />
+        <member name="utf16LinePos" type="uint64_t" />
+        <member name="utf16Offset" type="uint64_t" />
+        <member name="utf16Length" type="uint64_t" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ComputePassDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="timestampWrites" type="ComputePassTimestampWrites" optional="true" annotation="const *" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ComputePassTimestampWrites</name>
+      <members>
+        <member name="querySet" type="QuerySet" />
+        <member name="beginningOfPassWriteIndex" type="uint32_t" default="WGPU_QUERY_SET_INDEX_UNDEFINED" />
+        <member name="endOfPassWriteIndex" type="uint32_t" default="WGPU_QUERY_SET_INDEX_UNDEFINED" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ComputePipelineDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="layout" type="PipelineLayout" optional="true" />
+        <member name="compute" type="ProgrammableStageDescriptor" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>Limits</name>
+      <members>
+        <member name="maxTextureDimension1D" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxTextureDimension2D" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxTextureDimension3D" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxTextureArrayLayers" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxBindGroups" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxBindGroupsPlusVertexBuffers" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxBindingsPerBindGroup" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxDynamicUniformBuffersPerPipelineLayout" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxDynamicStorageBuffersPerPipelineLayout" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxSampledTexturesPerShaderStage" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxSamplersPerShaderStage" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxStorageBuffersPerShaderStage" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxStorageTexturesPerShaderStage" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxUniformBuffersPerShaderStage" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxUniformBufferBindingSize" type="uint64_t" default="WGPU_LIMIT_U64_UNDEFINED" />
+        <member name="maxStorageBufferBindingSize" type="uint64_t" default="WGPU_LIMIT_U64_UNDEFINED" />
+        <member name="minUniformBufferOffsetAlignment" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="minStorageBufferOffsetAlignment" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxVertexBuffers" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxBufferSize" type="uint64_t" default="WGPU_LIMIT_U64_UNDEFINED" />
+        <member name="maxVertexAttributes" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxVertexBufferArrayStride" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxInterStageShaderComponents" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxInterStageShaderVariables" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxColorAttachments" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxColorAttachmentBytesPerSample" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxComputeWorkgroupStorageSize" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxComputeInvocationsPerWorkgroup" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxComputeWorkgroupSizeX" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxComputeWorkgroupSizeY" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxComputeWorkgroupSizeZ" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+        <member name="maxComputeWorkgroupsPerDimension" type="uint32_t" default="WGPU_LIMIT_U32_UNDEFINED" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>RequiredLimits</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="limits" type="Limits" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SupportedLimits</name>
+      <extensible>out</extensible>
+      <members>
+        <member name="limits" type="Limits" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>Extent3D</name>
+      <members>
+        <member name="width" type="uint32_t" />
+        <member name="height" type="uint32_t" default="1" />
+        <member name="depthOrArrayLayers" type="uint32_t" default="1" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ImageCopyBuffer</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="layout" type="TextureDataLayout" />
+        <member name="buffer" type="Buffer" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ImageCopyTexture</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="texture" type="Texture" />
+        <member name="mipLevel" type="uint32_t" default="0" />
+        <member name="origin" type="Origin3D" />
+        <member name="aspect" type="TextureAspect" default="all" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>Future</name>
+      <members>
+        <member name="id" type="uint64_t" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>FutureWaitInfo</name>
+      <members>
+        <member name="future" type="Future" />
+        <member name="completed" type="bool" default="false" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>InstanceFeatures</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="timedWaitAnyEnable" type="bool" default="false" />
+        <member name="timedWaitAnyMaxCount" type="size_t" default="0" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>InstanceDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="features" type="InstanceFeatures" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>VertexAttribute</name>
+      <members>
+        <member name="format" type="VertexFormat" />
+        <member name="offset" type="uint64_t" />
+        <member name="shaderLocation" type="uint32_t" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>VertexBufferLayout</name>
+      <members>
+        <member name="arrayStride" type="uint64_t" />
+        <member name="stepMode" type="VertexStepMode" default="vertex" />
+        <member name="attributeCount" type="size_t" />
+        <member name="attributes" type="VertexAttribute" annotation="const *" length="attribute count" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>Origin3D</name>
+      <members>
+        <member name="x" type="uint32_t" default="0" />
+        <member name="y" type="uint32_t" default="0" />
+        <member name="z" type="uint32_t" default="0" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>PipelineLayoutDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="bindGroupLayoutCount" type="size_t" />
+        <member name="bindGroupLayouts" type="BindGroupLayout" annotation="const *" length="bind group layout count" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ProgrammableStageDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="module" type="ShaderModule" />
+        <member name="entryPoint" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="constantCount" type="size_t" default="0" />
+        <member name="constants" type="ConstantEntry" annotation="const *" length="constant count" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>QuerySetDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="type" type="QueryType" />
+        <member name="count" type="uint32_t" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>QueueDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>QueueWorkDoneCallbackInfo</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="mode" type="CallbackMode" />
+        <member name="callback" type="QueueWorkDoneCallback" />
+        <member name="userdata" type="void *" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>RenderBundleDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>RenderBundleEncoderDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="colorFormatCount" type="size_t" />
+        <member name="colorFormats" type="TextureFormat" annotation="const *" length="color format count" />
+        <member name="depthStencilFormat" type="TextureFormat" default="undefined" />
+        <member name="sampleCount" type="uint32_t" default="1" />
+        <member name="depthReadOnly" type="bool" default="false" />
+        <member name="stencilReadOnly" type="bool" default="false" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>RenderPassColorAttachment</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="view" type="TextureView" optional="true" />
+        <member name="depthSlice" type="uint32_t" default="WGPU_DEPTH_SLICE_UNDEFINED" />
+        <member name="resolveTarget" type="TextureView" optional="true" />
+        <member name="loadOp" type="LoadOp" />
+        <member name="storeOp" type="StoreOp" />
+        <member name="clearValue" type="Color" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>RenderPassDepthStencilAttachment</name>
+      <members>
+        <member name="view" type="TextureView" />
+        <member name="depthLoadOp" type="LoadOp" default="undefined" />
+        <member name="depthStoreOp" type="StoreOp" default="undefined" />
+        <member name="depthClearValue" type="float" default="NAN" />
+        <member name="depthReadOnly" type="bool" default="false" />
+        <member name="stencilLoadOp" type="LoadOp" default="undefined" />
+        <member name="stencilStoreOp" type="StoreOp" default="undefined" />
+        <member name="stencilClearValue" type="uint32_t" default="0" />
+        <member name="stencilReadOnly" type="bool" default="false" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>RenderPassDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="colorAttachmentCount" type="size_t" />
+        <member name="colorAttachments" type="RenderPassColorAttachment" annotation="const *" length="color attachment count" />
+        <member name="depthStencilAttachment" type="RenderPassDepthStencilAttachment" optional="true" annotation="const *" />
+        <member name="occlusionQuerySet" type="QuerySet" optional="true" />
+        <member name="timestampWrites" type="RenderPassTimestampWrites" optional="true" annotation="const *" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>RenderPassDescriptorMaxDrawCount</name>
+      <chained>
+        <dir>in</dir>
+        <root>RenderPassDescriptor</root>
+      </chained>
+      <members>
+        <member name="maxDrawCount" type="uint64_t" default="50000000" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>RenderPassTimestampWrites</name>
+      <members>
+        <member name="querySet" type="QuerySet" />
+        <member name="beginningOfPassWriteIndex" type="uint32_t" default="WGPU_QUERY_SET_INDEX_UNDEFINED" />
+        <member name="endOfPassWriteIndex" type="uint32_t" default="WGPU_QUERY_SET_INDEX_UNDEFINED" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>RequestDeviceCallbackInfo</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="mode" type="CallbackMode" />
+        <member name="callback" type="RequestDeviceCallback" />
+        <member name="userdata" type="void *" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>VertexState</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="module" type="ShaderModule" />
+        <member name="entryPoint" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="constantCount" type="size_t" default="0" />
+        <member name="constants" type="ConstantEntry" annotation="const *" length="constant count" />
+        <member name="bufferCount" type="size_t" default="0" />
+        <member name="buffers" type="VertexBufferLayout" annotation="const *" length="buffer count" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>PrimitiveState</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="topology" type="PrimitiveTopology" default="triangle list" />
+        <member name="stripIndexFormat" type="IndexFormat" default="undefined" />
+        <member name="frontFace" type="FrontFace" default="CCW" />
+        <member name="cullMode" type="CullMode" default="none" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>PrimitiveDepthClipControl</name>
+      <chained>
+        <dir>in</dir>
+        <root>PrimitiveState</root>
+      </chained>
+      <members>
+        <member name="unclippedDepth" type="bool" default="false" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>DepthStencilState</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="format" type="TextureFormat" />
+        <member name="depthWriteEnabled" type="bool" default="false" />
+        <member name="depthCompare" type="CompareFunction" default="undefined" />
+        <member name="stencilFront" type="StencilFaceState" />
+        <member name="stencilBack" type="StencilFaceState" />
+        <member name="stencilReadMask" type="uint32_t" default="0xFFFFFFFF" />
+        <member name="stencilWriteMask" type="uint32_t" default="0xFFFFFFFF" />
+        <member name="depthBias" type="int32_t" default="0" />
+        <member name="depthBiasSlopeScale" type="float" default="0.0f" />
+        <member name="depthBiasClamp" type="float" default="0.0f" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>MultisampleState</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="count" type="uint32_t" default="1" />
+        <member name="mask" type="uint32_t" default="0xFFFFFFFF" />
+        <member name="alphaToCoverageEnabled" type="bool" default="false" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>FragmentState</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="module" type="ShaderModule" />
+        <member name="entryPoint" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="constantCount" type="size_t" default="0" />
+        <member name="constants" type="ConstantEntry" annotation="const *" length="constant count" />
+        <member name="targetCount" type="size_t" />
+        <member name="targets" type="ColorTargetState" annotation="const *" length="target count" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ColorTargetState</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="format" type="TextureFormat" />
+        <member name="blend" type="BlendState" optional="true" annotation="const *" />
+        <member name="writeMask" type="ColorWriteMask" default="all" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>BlendState</name>
+      <members>
+        <member name="color" type="BlendComponent" />
+        <member name="alpha" type="BlendComponent" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>RenderPipelineDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="layout" type="PipelineLayout" optional="true" />
+        <member name="vertex" type="VertexState" />
+        <member name="primitive" type="PrimitiveState" />
+        <member name="depthStencil" type="DepthStencilState" optional="true" annotation="const *" />
+        <member name="multisample" type="MultisampleState" />
+        <member name="fragment" type="FragmentState" optional="true" annotation="const *" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SamplerDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="addressModeU" type="AddressMode" default="clamp to edge" />
+        <member name="addressModeV" type="AddressMode" default="clamp to edge" />
+        <member name="addressModeW" type="AddressMode" default="clamp to edge" />
+        <member name="magFilter" type="FilterMode" default="nearest" />
+        <member name="minFilter" type="FilterMode" default="nearest" />
+        <member name="mipmapFilter" type="MipmapFilterMode" default="nearest" />
+        <member name="lodMinClamp" type="float" default="0.0f" />
+        <member name="lodMaxClamp" type="float" default="32.0f" />
+        <member name="compare" type="CompareFunction" default="undefined" />
+        <member name="maxAnisotropy" type="uint16_t" default="1" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ShaderModuleDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="hintCount" type="size_t" default="0" />
+        <member name="hints" type="ShaderModuleCompilationHint" annotation="const *" length="hint count" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ShaderModuleCompilationHint</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="entryPoint" type="char" annotation="const *" length="strlen" />
+        <member name="layout" type="PipelineLayout" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ShaderModuleSPIRVDescriptor</name>
+      <chained>
+        <dir>in</dir>
+        <root>ShaderModuleDescriptor</root>
+      </chained>
+      <members>
+        <member name="codeSize" type="uint32_t" />
+        <member name="code" type="uint32_t" annotation="const *" length="code size" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>ShaderModuleWGSLDescriptor</name>
+      <chained>
+        <dir>in</dir>
+        <root>ShaderModuleDescriptor</root>
+      </chained>
+      <members>
+        <member name="code" type="char" annotation="const *" length="strlen" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>StencilFaceState</name>
+      <members>
+        <member name="compare" type="CompareFunction" default="always" />
+        <member name="failOp" type="StencilOperation" default="keep" />
+        <member name="depthFailOp" type="StencilOperation" default="keep" />
+        <member name="passOp" type="StencilOperation" default="keep" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SurfaceDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SurfaceDescriptorFromAndroidNativeWindow</name>
+      <chained>
+        <dir>in</dir>
+        <root>SurfaceDescriptor</root>
+      </chained>
+      <members>
+        <member name="window" type="void" annotation="*" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SurfaceDescriptorFromCanvasHTMLSelector</name>
+      <chained>
+        <dir>in</dir>
+        <root>SurfaceDescriptor</root>
+      </chained>
+      <members>
+        <member name="selector" type="char" annotation="const *" length="strlen" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SurfaceDescriptorFromMetalLayer</name>
+      <chained>
+        <dir>in</dir>
+        <root>SurfaceDescriptor</root>
+      </chained>
+      <members>
+        <member name="layer" type="void" annotation="*" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SurfaceDescriptorFromWindowsHWND</name>
+      <chained>
+        <dir>in</dir>
+        <root>SurfaceDescriptor</root>
+      </chained>
+      <members>
+        <member name="hinstance" type="void" annotation="*" />
+        <member name="hwnd" type="void" annotation="*" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SurfaceDescriptorFromXcbWindow</name>
+      <chained>
+        <dir>in</dir>
+        <root>SurfaceDescriptor</root>
+      </chained>
+      <members>
+        <member name="connection" type="void" annotation="*" />
+        <member name="window" type="uint32_t" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SurfaceDescriptorFromXlibWindow</name>
+      <chained>
+        <dir>in</dir>
+        <root>SurfaceDescriptor</root>
+      </chained>
+      <members>
+        <member name="display" type="void" annotation="*" />
+        <member name="window" type="uint64_t" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SurfaceDescriptorFromWaylandSurface</name>
+      <chained>
+        <dir>in</dir>
+        <root>SurfaceDescriptor</root>
+      </chained>
+      <members>
+        <member name="display" type="void" annotation="*" />
+        <member name="surface" type="void" annotation="*" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>SurfaceTexture</name>
+      <members>
+        <member name="texture" type="Texture" />
+        <member name="suboptimal" type="bool" />
+        <member name="status" type="SurfaceGetCurrentTextureStatus" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>TextureDataLayout</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="offset" type="uint64_t" default="0" />
+        <member name="bytesPerRow" type="uint32_t" default="WGPU_COPY_STRIDE_UNDEFINED" />
+        <member name="rowsPerImage" type="uint32_t" default="WGPU_COPY_STRIDE_UNDEFINED" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>TextureDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="usage" type="TextureUsage" />
+        <member name="dimension" type="TextureDimension" default="2D" />
+        <member name="size" type="Extent3D" />
+        <member name="format" type="TextureFormat" />
+        <member name="mipLevelCount" type="uint32_t" default="1" />
+        <member name="sampleCount" type="uint32_t" default="1" />
+        <member name="viewFormatCount" type="size_t" default="0" />
+        <member name="viewFormats" type="TextureFormat" annotation="const *" length="view format count" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>TextureBindingViewDimensionDescriptor</name>
+      <chained>
+        <dir>in</dir>
+        <root>TextureDescriptor</root>
+      </chained>
+      <members>
+        <member name="textureBindingViewDimension" type="TextureViewDimension" default="undefined" />
+      </members>
+    </type>
+    <type kind='struct'>
+      <name>TextureViewDescriptor</name>
+      <extensible>in</extensible>
+      <members>
+        <member name="label" type="char" optional="true" annotation="const *" length="strlen" />
+        <member name="format" type="TextureFormat" default="undefined" />
+        <member name="dimension" type="TextureViewDimension" default="undefined" />
+        <member name="baseMipLevel" type="uint32_t" default="0" />
+        <member name="mipLevelCount" type="uint32_t" default="WGPU_MIP_LEVEL_COUNT_UNDEFINED" />
+        <member name="baseArrayLayer" type="uint32_t" default="0" />
+        <member name="arrayLayerCount" type="uint32_t" default="WGPU_ARRAY_LAYER_COUNT_UNDEFINED" />
+        <member name="aspect" type="TextureAspect" default="all" />
+      </members>
+    </type>
+
+  </types>
+
+  <free_functions>
+    <function name="CreateInstance" return="Instance">
+      <arg name="descriptor" type="InstanceDescriptor" annotation="const *" optional="true" />
+    </function>
+    <function name="GetProcAddress" return="Proc">
+      <arg name="device" type="Device" optional="true" />
+      <arg name="procName" type="char" annotation="const *" />
+    </function>
+    <function name="GetInstanceFeatures" return="bool">
+      <arg name="features" type="InstanceFeatures" annotation="*" />
+    </function>
+  </free_functions>
+
+  <function_pointers>
+    <function name="Proc" return="void" />
+    <function name="RequestAdapterCallback" return="void">
+      <arg name="status" type="RequestAdapterStatus" />
+      <arg name="adapter" type="Adapter" optional="true" />
+      <arg name="message" type="char" annotation="const *" optional="true" />
+      <arg name="userdata" type="void *" />
+    </function>
+    <function name="BufferMapCallback" return="void">
+      <arg name="status" type="BufferMapAsyncStatus" />
+      <arg name="userdata" type="void *" />
+    </function>
+    <function name="CompilationInfoCallback" return="void">
+      <arg name="status" type="CompilationInfoRequestStatus" />
+      <arg name="compilationInfo" type="CompilationInfo" annotation="const *" />
+      <arg name="userdata" type="void *" />
+    </function>
+    <function name="CreateComputePipelineAsyncCallback" return="void">
+      <arg name="status" type="CreatePipelineAsyncStatus" />
+      <arg name="pipeline" type="ComputePipeline" optional="true" />
+      <arg name="message" type="char" annotation="const *" optional="true" />
+      <arg name="userdata" type="void *" />
+    </function>
+    <function name="CreateRenderPipelineAsyncCallback" return="void">
+      <arg name="status" type="CreatePipelineAsyncStatus" />
+      <arg name="pipeline" type="RenderPipeline" optional="true" />
+      <arg name="message" type="char" annotation="const *" optional="true" />
+      <arg name="userdata" type="void *" />
+    </function>
+    <function name="DeviceLostCallback" return="void">
+      <arg name="reason" type="DeviceLostReason" />
+      <arg name="message" type="char" annotation="const *" />
+      <arg name="userdata" type="void *" />
+    </function>
+    <function name="ErrorCallback" return="void">
+      <arg name="type" type="ErrorType" />
+      <arg name="message" type="char" annotation="const *" />
+      <arg name="userdata" type="void *" />
+    </function>
+    <function name="QueueWorkDoneCallback" return="void">
+      <arg name="status" type="QueueWorkDoneStatus" />
+      <arg name="userdata" type="void *" />
+    </function>
+    <function name="RequestDeviceCallback" return="void">
+      <arg name="status" type="RequestDeviceStatus" />
+      <arg name="device" type="Device" optional="true" />
+      <arg name="message" type="char" annotation="const *" optional="true" />
+      <arg name="userdata" type="void *" />
+    </function>
+  </function_pointers>
+
+  <objects>
+    <object refcounted="true">
+      <name>Adapter</name>
+      <methods>
+        <function name="GetLimits" return="bool">
+          <arg name="limits" type="SupportedLimits" annotation="*" />
+        </function>
+        <function name="GetProperties" return="void">
+          <arg name="properties" type="AdapterProperties" annotation="*" />
+        </function>
+        <function name="HasFeature" return="bool">
+          <arg name="feature" type="FeatureName" />
+        </function>
+        <function name="EnumerateFeatures" return="size_t">
+          <arg name="features" type="FeatureName" annotation="*" />
+        </function>
+        <function name="RequestDevice" async="true">
+          <arg name="descriptor" type="DeviceDescriptor" annotation="const *" optional="true" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>BindGroup</name>
+      <methods>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>BindGroupLayout</name>
+      <methods>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>Buffer</name>
+      <methods>
+        <function name="MapAsync" async="true" cb="BufferMapCallback">
+          <arg name="mode" type="MapMode" />
+          <arg name="offset" type="size_t" />
+          <arg name="size" type="size_t" />
+        </function>
+        <function name="GetMappedRange" return="void *">
+          <arg name="offset" type="size_t" default="0" />
+          <arg name="size" type="size_t" default="WGPU_WHOLE_MAP_SIZE" />
+        </function>
+        <function name="GetConstMappedRange" return="void const *">
+          <arg name="offset" type="size_t" default="0" />
+          <arg name="size" type="size_t" default="WGPU_WHOLE_MAP_SIZE" />
+        </function>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+        <function name="GetUsage" return="BufferUsage" />
+        <function name="GetSize" return="uint64_t" />
+        <function name="GetMapState" return="BufferMapState" />
+        <function name="Unmap" return="void" />
+        <function name="Destroy" return="void" />
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>CommandBuffer</name>
+      <methods>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>CommandEncoder</name>
+      <methods>
+        <function name="Finish" return="CommandBuffer">
+          <arg name="descriptor" type="CommandBufferDescriptor" annotation="const *" optional="true" />
+        </function>
+        <function name="BeginComputePass" return="ComputePassEncoder">
+          <arg name="descriptor" type="ComputePassDescriptor" annotation="const *" optional="true" />
+        </function>
+        <function name="BeginRenderPass" return="RenderPassEncoder">
+          <arg name="descriptor" type="RenderPassDescriptor" annotation="const *" />
+        </function>
+        <function name="CopyBufferToBuffer" return="void">
+          <arg name="source" type="Buffer" />
+          <arg name="sourceOffset" type="uint64_t" />
+          <arg name="destination" type="Buffer" />
+          <arg name="destinationOffset" type="uint64_t" />
+          <arg name="size" type="uint64_t" />
+        </function>
+        <function name="CopyBufferToTexture" return="void">
+          <arg name="source" type="ImageCopyBuffer" annotation="const *" />
+          <arg name="destination" type="ImageCopyTexture" annotation="const *" />
+          <arg name="copySize" type="Extent3D" annotation="const *" />
+        </function>
+        <function name="CopyTextureToBuffer" return="void">
+          <arg name="source" type="ImageCopyTexture" annotation="const *" />
+          <arg name="destination" type="ImageCopyBuffer" annotation="const *" />
+          <arg name="copySize" type="Extent3D" annotation="const *" />
+        </function>
+        <function name="CopyTextureToTexture" return="void">
+          <arg name="source" type="ImageCopyTexture" annotation="const *" />
+          <arg name="destination" type="ImageCopyTexture" annotation="const *" />
+          <arg name="copySize" type="Extent3D" annotation="const *" />
+        </function>
+        <function name="ClearBuffer" return="void">
+          <arg name="buffer" type="Buffer" />
+          <arg name="offset" type="uint64_t" default="0" />
+          <arg name="size" type="uint64_t" default="WGPU_WHOLE_SIZE" />
+        </function>
+        <function name="InsertDebugMarker" return="void">
+          <arg name="markerLabel" type="char" annotation="const *" length="strlen" />
+        </function>
+        <function name="PopDebugGroup" return="void" />
+        <function name="PushDebugGroup" return="void">
+          <arg name="groupLabel" type="char" annotation="const *" length="strlen" />
+        </function>
+        <function name="ResolveQuerySet" return="void">
+          <arg name="querySet" type="QuerySet" />
+          <arg name="firstQuery" type="uint32_t" />
+          <arg name="queryCount" type="uint32_t" />
+          <arg name="destination" type="Buffer" />
+          <arg name="destinationOffset" type="uint64_t" />
+        </function>
+        <function name="WriteTimestamp" return="void">
+          <arg name="querySet" type="QuerySet" />
+          <arg name="queryIndex" type="uint32_t" />
+        </function>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>ComputePassEncoder</name>
+      <methods>
+        <function name="InsertDebugMarker" return="void">
+          <arg name="markerLabel" type="char" annotation="const *" length="strlen" />
+        </function>
+        <function name="PopDebugGroup" return="void" />
+        <function name="PushDebugGroup" return="void">
+          <arg name="groupLabel" type="char" annotation="const *" length="strlen" />
+        </function>
+        <function name="SetPipeline" return="void">
+          <arg name="pipeline" type="ComputePipeline" />
+        </function>
+        <function name="SetBindGroup" return="void">
+          <arg name="groupIndex" type="uint32_t" />
+          <arg name="group" type="BindGroup" optional="true" />
+          <arg name="dynamicOffsetCount" type="size_t" default="0" />
+          <arg name="dynamicOffsets" type="uint32_t" annotation="const *" length="dynamic offset count" default="nullptr" />
+        </function>
+        <function name="DispatchWorkgroups" return="void">
+          <arg name="workgroupCountX" type="uint32_t" />
+          <arg name="workgroupCountY" type="uint32_t" default="1" />
+          <arg name="workgroupCountZ" type="uint32_t" default="1" />
+        </function>
+        <function name="DispatchWorkgroupsIndirect" return="void">
+          <arg name="indirectBuffer" type="Buffer" />
+          <arg name="indirectOffset" type="uint64_t" />
+        </function>
+        <function name="End" return="void" />
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>ComputePipeline</name>
+      <methods>
+        <function name="GetBindGroupLayout" return="BindGroupLayout">
+          <arg name="groupIndex" type="uint32_t" />
+        </function>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>Device</name>
+      <methods>
+        <function name="CreateBindGroup" return="BindGroup">
+          <arg name="descriptor" type="BindGroupDescriptor" annotation="const *" />
+        </function>
+        <function name="CreateBindGroupLayout" return="BindGroupLayout">
+          <arg name="descriptor" type="BindGroupLayoutDescriptor" annotation="const *" />
+        </function>
+        <function name="CreateBuffer" return="Buffer">
+          <arg name="descriptor" type="BufferDescriptor" annotation="const *" />
+        </function>
+        <function name="CreateCommandEncoder" return="CommandEncoder">
+          <arg name="descriptor" type="CommandEncoderDescriptor" annotation="const *" optional="true" />
+        </function>
+        <function name="CreateComputePipeline" return="ComputePipeline">
+          <arg name="descriptor" type="ComputePipelineDescriptor" annotation="const *" />
+        </function>
+        <function name="CreateComputePipelineAsync" async="true">
+          <arg name="descriptor" type="ComputePipelineDescriptor" annotation="const *" />
+        </function>
+        <function name="CreatePipelineLayout" return="PipelineLayout">
+          <arg name="descriptor" type="PipelineLayoutDescriptor" annotation="const *" />
+        </function>
+        <function name="CreateQuerySet" return="QuerySet">
+          <arg name="descriptor" type="QuerySetDescriptor" annotation="const *" />
+        </function>
+        <function name="CreateRenderPipelineAsync" async="true">
+          <arg name="descriptor" type="RenderPipelineDescriptor" annotation="const *" />
+        </function>
+        <function name="CreateRenderBundleEncoder" return="RenderBundleEncoder">
+          <arg name="descriptor" type="RenderBundleEncoderDescriptor" annotation="const *" />
+        </function>
+        <function name="CreateRenderPipeline" return="RenderPipeline">
+          <arg name="descriptor" type="RenderPipelineDescriptor" annotation="const *" />
+        </function>
+        <function name="CreateSampler" return="Sampler">
+          <arg name="descriptor" type="SamplerDescriptor" annotation="const *" optional="true" />
+        </function>
+        <function name="CreateShaderModule" return="ShaderModule">
+          <arg name="descriptor" type="ShaderModuleDescriptor" annotation="const *" />
+        </function>
+        <function name="CreateTexture" return="Texture">
+          <arg name="descriptor" type="TextureDescriptor" annotation="const *" />
+        </function>
+        <function name="Destroy" return="void" />
+        <function name="GetLimits" return="bool">
+          <arg name="limits" type="SupportedLimits" annotation="*" />
+        </function>
+        <function name="HasFeature" return="bool">
+          <arg name="feature" type="FeatureName" />
+        </function>
+        <function name="EnumerateFeatures" return="size_t">
+          <arg name="features" type="FeatureName" annotation="*" />
+        </function>
+        <function name="GetQueue" return="Queue" />
+        <function name="SetUncapturedErrorCallback" async="true" cb="ErrorCallback">
+
+        </function>
+        <function name="PushErrorScope" return="void">
+          <arg name="filter" type="ErrorFilter" />
+        </function>
+        <function name="PopErrorScope" async="true" cb="ErrorCallback">
+
+        </function>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>Instance</name>
+      <methods>
+        <function name="CreateSurface" return="Surface">
+          <arg name="descriptor" type="SurfaceDescriptor" annotation="const *" />
+        </function>
+        <function name="ProcessEvents" return="void" />
+        <function name="WaitAny" return="WaitStatus">
+          <arg name="futureCount" type="size_t" />
+          <arg name="futures" type="FutureWaitInfo" annotation="*" length="future count" />
+          <arg name="timeoutNS" type="uint64_t" />
+        </function>
+        <function name="RequestAdapter" async="true">
+          <arg name="options" type="RequestAdapterOptions" annotation="const *" optional="true" />
+        </function>
+        <function name="HasWGSLLanguageFeature" return="bool">
+          <arg name="feature" type="WGSLFeatureName" />
+        </function>
+        <function name="EnumerateWGSLLanguageFeatures" return="size_t">
+          <arg name="features" type="WGSLFeatureName" annotation="*" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>PipelineLayout</name>
+      <methods>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>QuerySet</name>
+      <methods>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+        <function name="GetType" return="QueryType" />
+        <function name="GetCount" return="uint32_t" />
+        <function name="Destroy" return="void" />
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>Queue</name>
+      <methods>
+        <function name="Submit" return="void">
+          <arg name="commandCount" type="size_t" />
+          <arg name="commands" type="CommandBuffer" annotation="const *" length="command count" />
+        </function>
+        <function name="WriteBuffer" return="void">
+          <arg name="buffer" type="Buffer" />
+          <arg name="bufferOffset" type="uint64_t" />
+          <arg name="data" type="void" annotation="const *" length="size" />
+          <arg name="size" type="size_t" />
+        </function>
+        <function name="WriteTexture" return="void">
+          <arg name="destination" type="ImageCopyTexture" annotation="const *" />
+          <arg name="data" type="void" annotation="const *" length="data size" />
+          <arg name="dataSize" type="size_t" />
+          <arg name="dataLayout" type="TextureDataLayout" annotation="const *" />
+          <arg name="writeSize" type="Extent3D" annotation="const *" />
+        </function>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>RenderBundle</name>
+      <methods>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>RenderBundleEncoder</name>
+      <methods>
+        <function name="SetPipeline" return="void">
+          <arg name="pipeline" type="RenderPipeline" />
+        </function>
+        <function name="SetBindGroup" return="void">
+          <arg name="groupIndex" type="uint32_t" />
+          <arg name="group" type="BindGroup" optional="true" />
+          <arg name="dynamicOffsetCount" type="size_t" default="0" />
+          <arg name="dynamicOffsets" type="uint32_t" annotation="const *" length="dynamic offset count" default="nullptr" />
+        </function>
+        <function name="Draw" return="void">
+          <arg name="vertexCount" type="uint32_t" />
+          <arg name="instanceCount" type="uint32_t" default="1" />
+          <arg name="firstVertex" type="uint32_t" default="0" />
+          <arg name="firstInstance" type="uint32_t" default="0" />
+        </function>
+        <function name="DrawIndexed" return="void">
+          <arg name="indexCount" type="uint32_t" />
+          <arg name="instanceCount" type="uint32_t" default="1" />
+          <arg name="firstIndex" type="uint32_t" default="0" />
+          <arg name="baseVertex" type="int32_t" default="0" />
+          <arg name="firstInstance" type="uint32_t" default="0" />
+        </function>
+        <function name="DrawIndirect" return="void">
+          <arg name="indirectBuffer" type="Buffer" />
+          <arg name="indirectOffset" type="uint64_t" />
+        </function>
+        <function name="DrawIndexedIndirect" return="void">
+          <arg name="indirectBuffer" type="Buffer" />
+          <arg name="indirectOffset" type="uint64_t" />
+        </function>
+        <function name="InsertDebugMarker" return="void">
+          <arg name="markerLabel" type="char" annotation="const *" length="strlen" />
+        </function>
+        <function name="PopDebugGroup" return="void" />
+        <function name="PushDebugGroup" return="void">
+          <arg name="groupLabel" type="char" annotation="const *" length="strlen" />
+        </function>
+        <function name="SetVertexBuffer" return="void">
+          <arg name="slot" type="uint32_t" />
+          <arg name="buffer" type="Buffer" optional="true" />
+          <arg name="offset" type="uint64_t" default="0" />
+          <arg name="size" type="uint64_t" default="WGPU_WHOLE_SIZE" />
+        </function>
+        <function name="SetIndexBuffer" return="void">
+          <arg name="buffer" type="Buffer" />
+          <arg name="format" type="IndexFormat" />
+          <arg name="offset" type="uint64_t" default="0" />
+          <arg name="size" type="uint64_t" default="WGPU_WHOLE_SIZE" />
+        </function>
+        <function name="Finish" return="RenderBundle">
+          <arg name="descriptor" type="RenderBundleDescriptor" annotation="const *" optional="true" />
+        </function>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>RenderPassEncoder</name>
+      <methods>
+        <function name="SetPipeline" return="void">
+          <arg name="pipeline" type="RenderPipeline" />
+        </function>
+        <function name="SetBindGroup" return="void">
+          <arg name="groupIndex" type="uint32_t" />
+          <arg name="group" type="BindGroup" optional="true" />
+          <arg name="dynamicOffsetCount" type="size_t" default="0" />
+          <arg name="dynamicOffsets" type="uint32_t" annotation="const *" length="dynamic offset count" default="nullptr" />
+        </function>
+        <function name="Draw" return="void">
+          <arg name="vertexCount" type="uint32_t" />
+          <arg name="instanceCount" type="uint32_t" default="1" />
+          <arg name="firstVertex" type="uint32_t" default="0" />
+          <arg name="firstInstance" type="uint32_t" default="0" />
+        </function>
+        <function name="DrawIndexed" return="void">
+          <arg name="indexCount" type="uint32_t" />
+          <arg name="instanceCount" type="uint32_t" default="1" />
+          <arg name="firstIndex" type="uint32_t" default="0" />
+          <arg name="baseVertex" type="int32_t" default="0" />
+          <arg name="firstInstance" type="uint32_t" default="0" />
+        </function>
+        <function name="DrawIndirect" return="void">
+          <arg name="indirectBuffer" type="Buffer" />
+          <arg name="indirectOffset" type="uint64_t" />
+        </function>
+        <function name="DrawIndexedIndirect" return="void">
+          <arg name="indirectBuffer" type="Buffer" />
+          <arg name="indirectOffset" type="uint64_t" />
+        </function>
+        <function name="ExecuteBundles" return="void">
+          <arg name="bundleCount" type="size_t" />
+          <arg name="bundles" type="RenderBundle" annotation="const *" length="bundle count" />
+        </function>
+        <function name="InsertDebugMarker" return="void">
+          <arg name="markerLabel" type="char" annotation="const *" length="strlen" />
+        </function>
+        <function name="PopDebugGroup" return="void" />
+        <function name="PushDebugGroup" return="void">
+          <arg name="groupLabel" type="char" annotation="const *" length="strlen" />
+        </function>
+        <function name="SetStencilReference" return="void">
+          <arg name="reference" type="uint32_t" />
+        </function>
+        <function name="SetBlendConstant" return="void">
+          <arg name="color" type="Color" annotation="const *" />
+        </function>
+        <function name="SetViewport" return="void">
+          <arg name="x" type="float" />
+          <arg name="y" type="float" />
+          <arg name="width" type="float" />
+          <arg name="height" type="float" />
+          <arg name="minDepth" type="float" />
+          <arg name="maxDepth" type="float" />
+        </function>
+        <function name="SetScissorRect" return="void">
+          <arg name="x" type="uint32_t" />
+          <arg name="y" type="uint32_t" />
+          <arg name="width" type="uint32_t" />
+          <arg name="height" type="uint32_t" />
+        </function>
+        <function name="SetVertexBuffer" return="void">
+          <arg name="slot" type="uint32_t" />
+          <arg name="buffer" type="Buffer" optional="true" />
+          <arg name="offset" type="uint64_t" default="0" />
+          <arg name="size" type="uint64_t" default="WGPU_WHOLE_SIZE" />
+        </function>
+        <function name="SetIndexBuffer" return="void">
+          <arg name="buffer" type="Buffer" />
+          <arg name="format" type="IndexFormat" />
+          <arg name="offset" type="uint64_t" default="0" />
+          <arg name="size" type="uint64_t" default="WGPU_WHOLE_SIZE" />
+        </function>
+        <function name="BeginOcclusionQuery" return="void">
+          <arg name="queryIndex" type="uint32_t" />
+        </function>
+        <function name="EndOcclusionQuery" return="void" />
+        <function name="End" return="void" />
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>RenderPipeline</name>
+      <methods>
+        <function name="GetBindGroupLayout" return="BindGroupLayout">
+          <arg name="groupIndex" type="uint32_t" />
+        </function>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>Sampler</name>
+      <methods>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>ShaderModule</name>
+      <methods>
+        <function name="GetCompilationInfo" async="true" cb="CompilationInfoCallback">
+
+        </function>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>Surface</name>
+      <methods>
+        <function name="Configure" return="void">
+          <arg name="config" type="SurfaceConfiguration" annotation="const *" />
+        </function>
+        <function name="GetCapabilities" return="void">
+          <arg name="adapter" type="Adapter" />
+          <arg name="capabilities" type="SurfaceCapabilities" annotation="*" />
+        </function>
+        <function name="GetCurrentTexture" return="void">
+          <arg name="surfaceTexture" type="SurfaceTexture" annotation="*" />
+        </function>
+        <function name="GetPreferredFormat" return="TextureFormat">
+          <arg name="adapter" type="Adapter" />
+        </function>
+        <function name="Present" return="void" />
+        <function name="Unconfigure" return="void" />
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>Texture</name>
+      <methods>
+        <function name="CreateView" return="TextureView">
+          <arg name="descriptor" type="TextureViewDescriptor" annotation="const *" optional="true" />
+        </function>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+        <function name="GetWidth" return="uint32_t" />
+        <function name="GetHeight" return="uint32_t" />
+        <function name="GetDepthOrArrayLayers" return="uint32_t" />
+        <function name="GetMipLevelCount" return="uint32_t" />
+        <function name="GetSampleCount" return="uint32_t" />
+        <function name="GetDimension" return="TextureDimension" />
+        <function name="GetFormat" return="TextureFormat" />
+        <function name="GetUsage" return="TextureUsage" />
+        <function name="Destroy" return="void" />
+      </methods>
+    </object>
+    <object refcounted="true">
+      <name>TextureView</name>
+      <methods>
+        <function name="SetLabel" return="void">
+          <arg name="label" type="char" annotation="const *" length="strlen" />
+        </function>
+      </methods>
+    </object>
+
+  </objects>
+</webgpu>
